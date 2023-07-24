@@ -2,7 +2,8 @@
 <BES xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="BES.xsd">
 	<Analysis>
 		<Title>Veeam Agent for Windows Health Status</Title>
-		<Description><![CDATA[This Analysis provides the <STRONG>Installation Status</STRONG>, <STRONG>Veeam Agent Version</STRONG>, and <STRONG>Veeam Agent Service Status</STRONG> for endpoints. It also displays the date and time of the <STRONG>Last Successful</STRONG> and<STRONG> Last Failed backups</STRONG>. ]]></Description>
+		<Description><![CDATA[<P>The FREE standalone <STRONG>Veeam® Agent for Microsoft Windows</STRONG> provides a simple solution for backing up Windows-based desktops, laptops and tablets With <STRONG>Veeam Agent for Microsoft Windows</STRONG> FREE. So, you can easily back up your computer to an external hard drive, network-attached storage (NAS) share or a <STRONG>Veeam Backup &amp; Replication™</STRONG> repository.</P>
+<P>This Analysis provides the <STRONG>Installation Status</STRONG>, <STRONG>Veeam Agent Version</STRONG>, and <STRONG>Veeam Agent Service Status</STRONG> for endpoints. It also displays the date and time of the <STRONG>Last Successful</STRONG> and<STRONG> Last Failed backups</STRONG>. </P>]]></Description>
 		<GroupRelevance JoinByIntersection="false">
 			<SearchComponentPropertyReference PropertyName="OS" Comparison="Contains">
 				<SearchText>win</SearchText>
@@ -13,13 +14,13 @@
 		<SourceReleaseDate>2023-07-14</SourceReleaseDate>
 		<MIMEField>
 			<Name>x-fixlet-modification-time</Name>
-			<Value>Fri, 14 Jul 2023 11:48:36 +0000</Value>
+			<Value>Mon, 24 Jul 2023 14:26:25 +0000</Value>
 		</MIMEField>
 		<Domain>BESC</Domain>
 		<Property Name="Installation Status" ID="1" EvaluationPeriod="PT5M">if (exists (it as string) whose(it contains "Veeam Agent for Microsoft Windows") of values "DisplayName" of keys of keys "HKLM\Software\Microsoft\Windows\CurrentVersion\Uninstall" of (x64 registries; x32 registries)) then "Installed" else "Not installed"</Property>
-		<Property Name="Veeam Agent Version" ID="2" EvaluationPeriod="PT5M"> (    value "DisplayName" of it, value "DisplayVersion" of it  )  of keys   whose  (    exists value "DisplayName"     whose    (      it as string contains "Veeam"    )    of it  )  of keys "HKLM\Software\Microsoft\Windows\CurrentVersion\Uninstall" of   (    x32 registries; x64 registries  )  </Property>
-		<Property Name="Veeam Agent Service Status" ID="3" EvaluationPeriod="PT5M">(state of service "VeeamEndpointBackupSvc")</Property>
-		<Property Name="Last Successful Backup" ID="4" EvaluationPeriod="PT1H">maxima of times generated of records whose (source of it as lowercase = "Veeam Agent" as lowercase AND event id of it = 190 AND description of it contains "finished with Success.") of event log "Veeam Agent"</Property>
-		<Property Name="Last Failed Backup" ID="5" EvaluationPeriod="PT1H">maxima of times generated of records whose (source of it as lowercase = "Veeam Agent" as lowercase AND event id of it = 190 AND description of it contains "finished with Failed.") of event log "Veeam Agent"</Property>
+		<Property Name="Veeam Agent Version" ID="2" EvaluationPeriod="PT5M">if exists (( value "DisplayName" of it, value "DisplayVersion" of it ) of keys whose ( exists value "DisplayName" whose ( it as string contains "Veeam" ) of it) of keys "HKLM\Software\Microsoft\Windows\CurrentVersion\Uninstall" of ( x32 registries; x64 registries )) then(( value "DisplayName" of it, value "DisplayVersion" of it ) of keys whose ( exists value "DisplayName" whose ( it as string contains "Veeam") of it) of keys "HKLM\Software\Microsoft\Windows\CurrentVersion\Uninstall" of ( x32 registries; x64 registries ) as string) else("No agent installed")</Property>
+		<Property Name="Veeam Agent Service Status" ID="3" EvaluationPeriod="PT5M">if (exists service "VeeamEndpointBackupSvc" ) then(state of service "VeeamEndpointBackupSvc") else("Service not installed")</Property>
+		<Property Name="Last Successful Backup" ID="4" EvaluationPeriod="PT5M">if (exists service "VeeamEndpointBackupSvc")  then (maxima of times generated of records whose (source of it as lowercase = "Veeam Agent" as lowercase AND event id of it = 190 AND description of it contains "finished with Success.") of event log "Veeam Agent" as string)  else("Not configured")</Property>
+		<Property Name="Last Failed Backup" ID="5" EvaluationPeriod="PT5M">if (exists service "VeeamEndpointBackupSvc")  then (maxima of times generated of records whose (source of it as lowercase = "Veeam Agent" as lowercase AND event id of it = 190 AND description of it contains "finished with Failed.") of event log "Veeam Agent" as string)  else("Not installed")</Property>
 	</Analysis>
 </BES>
